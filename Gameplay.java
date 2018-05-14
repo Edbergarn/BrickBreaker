@@ -9,17 +9,15 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public boolean play = false;
     public int score = 0;
 
-    public int totalbricks = 21;
+
+    public int totalbricks = 21;// Antal bricks
 
     public Timer timer;
-    public int delay = 8;
+    public int delay = 6;
 
     public int playerX = 310;
 
-    public int ballposX = 120;
-    public int ballposY = 350;
-    public int ballXdir = -1;
-    public int ballYdir = -2;
+    public Ball ball = new Ball(120, 350, -2, -3);
 
     public MapGenerator map;
 
@@ -52,28 +50,55 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
         //Bollen
         g.setColor(Color.yellow);
-        g.fillOval(ballposX,ballposY,20,20);
+        g.fillOval(ball.xPos,ball.yPos,20,20);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         timer.start();
         if(play){
-            if(new Rectangle(ballposX, ballposY, 20,20).intersects(new Rectangle(playerX, 550, 100, 8))){
-                ballYdir = -ballYdir;
+            if(new Rectangle(ball.xPos, ball.yPos, 20,20).intersects(new Rectangle(playerX, 550, 100, 8))){ //När den studsar mot PlayerX
+                ball.yDir = -ball.yDir;
 
             }
-            
-            ballposX += ballXdir;
-            ballposY += ballYdir;
-            if(ballposX < 0){
-                ballXdir = -ballXdir;
+         A: for(int i =0; i<map.map.length; i++){
+               for (int j = 0; j<map.map[0].length; j++){
+                    if (map.map[i][j]> 0){
+                        int brickX = j* map.brickWidth + 80;
+                        int brickY = i* map.brickHeight + 50;
+                        int brickWidth = map.brickWidth;
+                        int brickHeigth = map.brickHeight;
+
+                        Rectangle rect = new Rectangle(brickX, brickY, brickWidth, brickHeigth);
+                        Rectangle ballRect = new Rectangle(ball.xPos, ball.yPos, 20, 20);
+                        Rectangle brickRect = rect;
+
+                        if (ballRect.intersects(brickRect)){
+                            map.setBrickValue(0, i, j);
+                            totalbricks--;
+                            score +=5;
+
+                            if (ball.xPos + 19 <= brickRect.x || ball.xPos + 1 >= brickRect.width){
+                                ball.xDir = -ball.xDir;
+                            }else {
+                                ball.yDir = -ball.yDir;
+                            }
+                            break A;
+                        }
+                    }
+                }
             }
-            if(ballposY < 0){
-                ballYdir = -ballYdir;
+
+            ball.xPos += ball.xDir;
+            ball.yPos += ball.yDir;
+            if(ball.xPos < 0){
+                ball.xDir = -ball.xDir;
             }
-            if(ballposX > 670){
-                ballXdir = -ballXdir;
+            if(ball.yPos < 0){
+                ball.yDir = -ball.yDir;
+            }
+            if(ball.xPos > 670){
+                ball.xDir = -ball.xDir;
             }
         }
         repaint();
@@ -93,8 +118,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }
         }
         if(e.getKeyCode() == KeyEvent.VK_LEFT){
-            if(playerX >= 10){
-                playerX-=10;
+            if(playerX <= 10){
+                playerX=10;
             }else{
                 moveLeft();
             }
