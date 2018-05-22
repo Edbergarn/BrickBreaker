@@ -13,7 +13,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public int totalbricks = 21;// Antal bricks
 
     public Timer timer;
-    public int delay = 6;
+    public int delay = 15;
 
     public int playerX = 310;
 
@@ -51,6 +51,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         //Bollen
         g.setColor(Color.yellow);
         g.fillOval(ball.xPos,ball.yPos,20,20);
+
+        if (totalbricks == 0){
+            g.setColor(Color.RED);
+            g.setFont(new Font("serif", Font.BOLD, 60));
+            g.drawString("You Win!", 200, 200);
+        }
     }
 
     @Override
@@ -78,7 +84,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                             totalbricks--;
                             score +=5;
 
-                            if (ball.xPos + 19 <= brickRect.x || ball.xPos + 1 >= brickRect.width){
+                            if (ball.xPos + 19 <= brickRect.x || ball.xPos + 1 >= brickRect.x +  brickRect.width){
                                 ball.xDir = -ball.xDir;
                             }else {
                                 ball.yDir = -ball.yDir;
@@ -99,6 +105,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }
             if(ball.xPos > 670){
                 ball.xDir = -ball.xDir;
+            }
+            if (totalbricks == 0){
+                play = false;
+
             }
         }
         repaint();
@@ -123,19 +133,15 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }else{
                 moveLeft();
             }
-        }
-
-
-    }
-
+        }}
     public void moveLeft() {
         play = true;
-        playerX-=20;
+        playerX -= 20;
     }
 
     public void moveRight() {
         play = true;
-        playerX+=20;
+        playerX += 20;
     }
 
     @Override
