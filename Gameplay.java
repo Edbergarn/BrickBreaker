@@ -1,3 +1,5 @@
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,7 +10,10 @@ import java.awt.event.KeyListener;
 public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public boolean play = false;
     public int score = 0;
+    boolean lose = false;
 
+    boolean right = false;
+    boolean left = false;
 
     public int totalbricks = 21;// Antal bricks
 
@@ -53,9 +58,14 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         g.fillOval(ball.xPos,ball.yPos,20,20);
 
         if (totalbricks == 0){
+            g.setColor(Color.GREEN);
+            g.setFont(new Font("serif", Font.BOLD, 60));
+            g.drawString("You Win!", 230, 300);
+        }
+        if (lose == true){
             g.setColor(Color.RED);
             g.setFont(new Font("serif", Font.BOLD, 60));
-            g.drawString("You Win!", 200, 200);
+            g.drawString("You Lose!", 230, 300);
         }
     }
 
@@ -110,6 +120,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 play = false;
 
             }
+            if (new Rectangle(ball.xPos, ball.yPos,20, 20).intersects(new Rectangle(0, 570, 600, 2))){
+                lose = true;
+                play = false;
+            }
         }
         repaint();
 
@@ -124,6 +138,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             if(playerX >= 600){
                 playerX=600;
             }else{
+                play = true;
+                right = true;
                 moveRight();
             }
         }
@@ -131,19 +147,29 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             if(playerX <= 10){
                 playerX=10;
             }else{
+                play = true;
+                left = true;
                 moveLeft();
             }
         }}
     public void moveLeft() {
-        play = true;
         playerX -= 20;
     }
 
     public void moveRight() {
-        play = true;
         playerX += 20;
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+            right = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT){
+            left = false;
+        }
+    }
+
+
+
 }
