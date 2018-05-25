@@ -6,23 +6,33 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.security.Key;
 
 public class Gameplay extends JPanel implements KeyListener, ActionListener {
     public boolean play = false;
     public int score = 0;
-    boolean lose = false;
+    private boolean lose = false;
 
-    boolean right = false;
-    boolean left = false;
+
 
     public int totalbricks = 21;// Antal bricks
 
     public Timer timer;
-    public int delay = 15;
+    public int delay = 5;
+
+
+    public static Timer timerLeft;
+    public static Timer timerRight;
 
     public int playerX = 310;
+    private static int stepSpeed = 2;
+    private static final int timeSpeed = 1;
+    private boolean movingRight = false;
+    private boolean movingLeft = false;
 
-    public Ball ball = new Ball(120, 350, -2, -3);
+
+
+    public Ball ball = new Ball(120, 350, -1, -2);
 
     public MapGenerator map;
 
@@ -57,16 +67,19 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         g.setColor(Color.yellow);
         g.fillOval(ball.xPos,ball.yPos,20,20);
 
+
+
         if (totalbricks == 0){
             g.setColor(Color.GREEN);
             g.setFont(new Font("serif", Font.BOLD, 60));
             g.drawString("You Win!", 230, 300);
         }
-        if (lose == true){
+        if (lose){
             g.setColor(Color.RED);
             g.setFont(new Font("serif", Font.BOLD, 60));
             g.drawString("You Lose!", 230, 300);
         }
+        g.dispose();
     }
 
     @Override
@@ -77,7 +90,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 ball.yDir = -ball.yDir;
 
             }
-         A: for(int i =0; i<map.map.length; i++){
+         A: for(int i = 0; i<map.map.length; i++){
                for (int j = 0; j<map.map[0].length; j++){
                     if (map.map[i][j]> 0){
                         int brickX = j* map.brickWidth + 80;
@@ -94,7 +107,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                             totalbricks--;
                             score +=5;
 
-                            if (ball.xPos + 19 <= brickRect.x || ball.xPos + 1 >= brickRect.x +  brickRect.width){
+                            if (ball.xPos + 19 <= brickRect.x || ball.xPos + 1 >= brickRect.x + brickRect.width){
                                 ball.xDir = -ball.xDir;
                             }else {
                                 ball.yDir = -ball.yDir;
@@ -118,11 +131,13 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             }
             if (totalbricks == 0){
                 play = false;
+                stepSpeed = 0;
 
             }
             if (new Rectangle(ball.xPos, ball.yPos,20, 20).intersects(new Rectangle(0, 570, 600, 2))){
                 lose = true;
                 play = false;
+                stepSpeed = 0;
             }
         }
         repaint();
@@ -134,40 +149,44 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.VK_RIGHT){
-            if(playerX >= 600){
-                playerX=600;
-            }else{
-                play = true;
-                right = true;
-                moveRight();
-            }
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && !movingLeft){
+            play = true;
+            movingLeft = true;
+            timerLeft = new Timer(timeSpeed, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    playerX -= stepSpeed;
+                }
+            });
+            timerLeft.start();
         }
-        if(e.getKeyCode() == KeyEvent.VK_LEFT){
-            if(playerX <= 10){
-                playerX=10;
-            }else{
-                play = true;
-                left = true;
-                moveLeft();
-            }
-        }}
-    public void moveLeft() {
-        playerX -= 20;
-    }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && !movingRight){
+            play = true;
+            movingRight = true;
+            timerRight =  new Timer(timeSpeed, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    playerX += stepSpeed;
+                }
+            });
+            timerRight.start();
+        }
 
-    public void moveRight() {
-        playerX += 20;
-    }
 
+
+
+    }
     @Override
     public void keyReleased(KeyEvent e) {
+        if(e.getKeyCode() == KeyEvent.VK_LEFT){
+            movingLeft = false;
+            timerLeft.stop();
+        }
         if (e.getKeyCode() == KeyEvent.VK_RIGHT){
-            right = false;
+            movingRight = false;
+            timerRight.stop();
         }
-        if (e.getKeyCode() == KeyEvent.VK_LEFT){
-            left = false;
-        }
+
     }
 
 
