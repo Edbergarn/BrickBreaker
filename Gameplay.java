@@ -29,10 +29,11 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
     private static final int timeSpeed = 1;
     private boolean movingRight = false;
     private boolean movingLeft = false;
+    int xvalue = (int)(Math.random()*590);
+    int dirY = (2*(int)(Math.pow(-1, (int)(Math.random()*2))));
 
 
-
-    public Ball ball = new Ball(120, 350, -1, -2);
+    public Ball ball = new Ball( xvalue, 350, dirY, -2);
 
     public MapGenerator map;
 
@@ -87,10 +88,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
         timer.start();
         if(play){
             if(new Rectangle(ball.xPos, ball.yPos, 20,20).intersects(new Rectangle(playerX, 550, 100, 8))){ //När den studsar mot PlayerX
-                ball.yDir = -ball.yDir;
+                if(ball.yDir > 0) {
+                    ball.yDir = -ball.yDir;
+                }
 
             }
-         A: for(int i = 0; i<map.map.length; i++){
+        A:  for(int i = 0; i<map.map.length; i++){
                for (int j = 0; j<map.map[0].length; j++){
                     if (map.map[i][j]> 0){
                         int brickX = j* map.brickWidth + 80;
@@ -134,7 +137,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
                 stepSpeed = 0;
 
             }
-            if (new Rectangle(ball.xPos, ball.yPos,20, 20).intersects(new Rectangle(0, 570, 600, 2))){
+            if (new Rectangle(ball.xPos, ball.yPos,20, 20).intersects(new Rectangle(0, 570, 600, 2))) {
                 lose = true;
                 play = false;
                 stepSpeed = 0;
@@ -155,7 +158,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             timerLeft = new Timer(timeSpeed, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    playerX -= stepSpeed;
+                   if (playerX > 2){
+                       playerX -= stepSpeed;
+                   }
                 }
             });
             timerLeft.start();
@@ -166,7 +171,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener {
             timerRight =  new Timer(timeSpeed, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    playerX += stepSpeed;
+                    if (playerX < 590) {
+                        playerX += stepSpeed;
+                    }
                 }
             });
             timerRight.start();
